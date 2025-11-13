@@ -6,8 +6,12 @@ import cors from "cors";
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// allow cross-origin requests
-app.use(cors());
+// allow cross-origin requests from specified origins
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://repurpose-ai.vercel.app"],
+  })
+);
 
 // middleware to handle file uploads
 app.use(
@@ -34,12 +38,10 @@ async function parsePDF(file: Uint8Array) {
 app.post("/upload", async (req: Request, res: Response) => {
   try {
     if (!req.files || !("file" in req.files)) {
-      return res
-        .status(400)
-        .json({
-          error: "No PDF file shared.",
-          body: `Body is ${JSON.stringify(req.body)}`,
-        });
+      return res.status(400).json({
+        error: "No PDF file shared.",
+        body: `Body is ${JSON.stringify(req.body)}`,
+      });
     }
 
     const pdfFile = req.files.file as UploadedFile;
@@ -57,12 +59,10 @@ app.post("/upload", async (req: Request, res: Response) => {
     ) {
       return res.status(500).json({ error: error.message, success: false });
     }
-    res
-      .status(500)
-      .json({
-        error: "Failed to process PDF due to an unknown error.",
-        success: false,
-      });
+    res.status(500).json({
+      error: "Failed to process PDF due to an unknown error.",
+      success: false,
+    });
   }
 });
 
